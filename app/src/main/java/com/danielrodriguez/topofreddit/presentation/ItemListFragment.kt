@@ -5,21 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.danielrodriguez.topofreddit.R
 import com.danielrodriguez.topofreddit.dummy.DummyContent
+import com.danielrodriguez.topofreddit.topOfRedditApplication
 import kotlinx.android.synthetic.main.fragment_item_list.*
 import kotlinx.android.synthetic.main.item_list_content.view.*
+import javax.inject.Inject
 
 class ItemListFragment : Fragment() {
 
-    private val isTablet: Boolean get() = arguments?.getBoolean(TABLET) ?: false
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var viewModel: ItemListViewModel
+
+    private val isTablet: Boolean get() = arguments?.getBoolean(TABLET) ?: false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,12 +36,17 @@ class ItemListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        item_list.adapter =
-            SimpleItemRecyclerViewAdapter(
-                activity!!,
-                DummyContent.ITEMS,
-                isTablet
-            )
+        activity?.topOfRedditApplication?.appComponent?.inject(this)
+
+        viewModel = ViewModelProvider(this, viewModelFactory)[ItemListViewModel::class.java]
+
+        item_list.adapter = SimpleItemRecyclerViewAdapter(activity!!, viewModel.items, isTablet)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        (activity as AppCompatActivity).supportActionBar?.title = getString(viewModel.title)
     }
 
     class SimpleItemRecyclerViewAdapter(private val parentActivity: FragmentActivity,

@@ -22,7 +22,6 @@ class ItemListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_item_list)
 
         setSupportActionBar(toolbar)
-        toolbar.title = title
 
         if (savedInstanceState == null) {
             supportFragmentManager
