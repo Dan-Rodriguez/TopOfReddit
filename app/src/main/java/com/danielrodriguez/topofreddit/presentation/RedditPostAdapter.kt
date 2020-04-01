@@ -5,11 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.danielrodriguez.topofreddit.R
 import com.danielrodriguez.topofreddit.domain.model.RedditPost
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_list_content.view.*
 
 class RedditPostAdapter(
@@ -71,6 +73,10 @@ class RedditPostAdapter(
 
             val quantity = if (item.hoursAgo == 1L) 1 else 0
             timestampTextView.text = parentActivity.resources.getQuantityString(R.plurals.x_hours_ago, quantity, item.hoursAgo)
+
+            if (item.thumbnail.isNotEmpty()) {
+                Picasso.get().load(item.thumbnail).into(imageView)
+            }
         }
     }
 
@@ -118,6 +124,7 @@ class RedditPostAdapter(
         val commentCountTextView: TextView = view.comment_count
         val viewedView: View = view.viewed
         val timestampTextView: TextView = view.timestamp
+        val imageView: ImageView = view.image
     }
 }
 

@@ -11,6 +11,7 @@
     <string name="title_placeholder">Title</string>
     <string name="hours_ago_placeholder">Hours ago</string>
     <string name="author_placeholder">Author</string>
+    <string name="user_thumbnail">User thumbnail</string>
     <plurals name="x_comments">
         <item quantity="one">%d comment</item>
         <item quantity="other">%d comments</item>

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.danielrodriguez.topofreddit.R
 import com.danielrodriguez.topofreddit.domain.model.RedditPost
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_detail.*
 
 class ItemDetailFragment : Fragment() {
@@ -32,7 +33,13 @@ class ItemDetailFragment : Fragment() {
         arguments?.let {
             if (it.containsKey(POST)) {
                 it.getParcelable<RedditPost>(POST)?.let { post ->
-                    item_detail.text = post.title
+                    author.text = post.author
+                    title.text = post.title
+
+                    if (post.thumbnail.isNotEmpty()) {
+                        Picasso.get().load(post.thumbnail).into(image)
+                    }
+
                     (activity as AppCompatActivity).supportActionBar?.title = post.author
 
                 } ?: run {

@@ -46,16 +46,17 @@
 
     <ImageView
         android:id="@+id/image"
+        android:contentDescription="@string/user_thumbnail"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:src="@android:drawable/ic_menu_camera"
-        android:scaleType="centerInside"
+        android:scaleType="centerCrop"
         android:background="@android:drawable/picture_frame"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier_1"
         app:layout_constraintBottom_toTopOf="@id/dismiss_button"
         app:layout_constraintDimensionRatio="1:1"
-        android:padding="@dimen/margin"
+        android:layout_margin="@dimen/margin"
         android:minHeight="@dimen/min_thumbnail_height"
         app:layout_constraintWidth_percent="0.25"/>
 
