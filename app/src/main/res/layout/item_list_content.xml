@@ -1,20 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <View
+        android:id="@+id/viewed"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/visited_button_size"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/author"
+        android:background="@drawable/circle"
+        android:layout_margin="@dimen/margin"/>
 
     <TextView
-        android:id="@+id/id_text"
+        android:id="@+id/author"
+        android:text="@string/author_placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/viewed"
+        android:layout_margin="@dimen/margin"
         android:textAppearance="?attr/textAppearanceListItem" />
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/timestamp"
+        android:text="@string/hours_ago_placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/author"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        android:layout_margin="@dimen/margin"
+        android:textAppearance="?attr/textAppearanceListItem" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="viewed, author"/>
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@android:drawable/ic_menu_camera"
+        android:scaleType="centerInside"
+        android:background="@android:drawable/picture_frame"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier_1"
+        app:layout_constraintBottom_toTopOf="@id/dismiss_button"
+        app:layout_constraintDimensionRatio="1:1"
+        android:padding="@dimen/margin"
+        android:minHeight="@dimen/min_thumbnail_height"
+        app:layout_constraintWidth_percent="0.25"/>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/title_placeholder"
+        app:layout_constraintStart_toEndOf="@id/image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier_1"
+        app:layout_constraintBottom_toTopOf="@id/dismiss_button"
+        app:layout_constraintWidth_percent="0.75"
+        android:padding="@dimen/padding"
         android:layout_margin="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem" />
-</LinearLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="image, title"/>
+
+    <TextView
+        android:id="@+id/dismiss_button"
+        android:enabled="true"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/dismiss_post"
+        android:drawableStart="@android:drawable/ic_menu_close_clear_cancel"
+        android:drawableTint="@android:color/holo_red_dark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center"
+        android:layout_margin="@dimen/margin"
+        app:layout_constraintHorizontal_bias="0"/>
+
+    <TextView
+        android:id="@+id/comment_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/comments_placeholder"
+        app:layout_constraintStart_toEndOf="@id/dismiss_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier_2"
+        android:gravity="center"
+        android:layout_margin="@dimen/margin"
+        app:layout_constraintHorizontal_bias="1"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
