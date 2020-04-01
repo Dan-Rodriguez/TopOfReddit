@@ -3,44 +3,22 @@ package com.danielrodriguez.topofreddit.domain.usecase
 import android.os.Handler
 import android.os.Looper
 import com.danielrodriguez.topofreddit.domain.model.RedditPost
+import com.danielrodriguez.topofreddit.domain.repository.IRedditPostRepository
 import io.reactivex.rxjava3.core.Single
+import javax.inject.Inject
 
-class GetRedditTopPostsUseCase: IGetRedditTopPostsUseCase {
+class GetRedditTopPostsUseCase @Inject constructor(
+    private val repository: IRedditPostRepository
+): IGetRedditTopPostsUseCase {
+
     override fun invoke(afterPost: RedditPost?): Single<List<RedditPost>> {
         return Single.create {
-            Thread {
-                Thread.sleep(2000)
+            afterPost?.let {
+                repository.topPostsAfter(it)
 
-                val posts = mutableListOf<RedditPost>()
-
-                Handler(Looper.getMainLooper()).post {
-
-                    val start = afterPost?.id ?: 0
-                    val end = start + 25
-
-                    for (i in start..end) {
-                        posts.add(createDummyItem(i))
-                    }
-
-                    it.onSuccess(posts)
-                }
+            } ?: run {
+                repository.topPosts()
             }
-            .start()
         }
-    }
-
-    private fun createDummyItem(position: Int): RedditPost {
-        return RedditPost(
-            position,
-            "Item " + position,
-            makeDetails(position)
-        )
-    }
-
-    private fun makeDetails(position: Int): String {
-        val builder = StringBuilder()
-        builder.append("Details about Item: ").append(position)
-        builder.append("\nMore details information here. $position")
-        return builder.toString()
     }
 }
