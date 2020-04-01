@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.danielrodriguez.topofreddit.R
@@ -36,23 +37,9 @@ class ItemListFragment : Fragment() {
 
         activity?.topOfRedditApplication?.appComponent?.inject(this)
 
-        viewModel = ViewModelProvider(this, viewModelFactory)[ItemListViewModel::class.java]
-
         val adapter = RedditPostAdapter(activity!!, isTablet)
+        item_list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         item_list.adapter = adapter
-
-        viewModel.posts.observe(this, Observer {
-            adapter.submitList(it)
-        })
-
-        viewModel.isLoading.observe(this, Observer {
-            swipeToRefresh.isRefreshing = it
-        })
-
-        swipeToRefresh.setOnRefreshListener {
-            viewModel.refresh()
-        }
-
         item_list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -70,6 +57,20 @@ class ItemListFragment : Fragment() {
                 }
             }
         })
+
+        viewModel = ViewModelProvider(this, viewModelFactory)[ItemListViewModel::class.java]
+
+        viewModel.posts.observe(this, Observer {
+            adapter.submitList(it)
+        })
+
+        viewModel.isLoading.observe(this, Observer {
+            swipeToRefresh.isRefreshing = it
+        })
+
+        swipeToRefresh.setOnRefreshListener {
+            viewModel.refresh()
+        }
     }
 
     override fun onResume() {
