@@ -45,6 +45,14 @@ class ItemListFragment : Fragment() {
             adapter.submitList(it)
         })
 
+        viewModel.isLoading.observe(this, Observer {
+            swipeToRefresh.isRefreshing = it
+        })
+
+        swipeToRefresh.setOnRefreshListener {
+            viewModel.refresh()
+        }
+
         item_list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)

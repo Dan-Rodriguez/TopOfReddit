@@ -54,7 +54,7 @@ class ItemListViewModel @Inject constructor(): ViewModel() {
         _isLoading.value = true
 
         Thread {
-            Thread.sleep(3000)
+            Thread.sleep(2000)
 
             Handler(Looper.getMainLooper()).post {
                 val start = ITEMS.size
@@ -70,5 +70,24 @@ class ItemListViewModel @Inject constructor(): ViewModel() {
             }
         }
         .start()
+    }
+
+    fun refresh() {
+        Thread {
+            Thread.sleep(2000)
+
+            Handler(Looper.getMainLooper()).post {
+                ITEMS.clear()
+
+                for (i in 1..25) {
+                    ITEMS.add(createDummyItem(i))
+                }
+
+                _posts.value = ITEMS
+
+                _isLoading.value = false
+            }
+        }
+            .start()
     }
 }
