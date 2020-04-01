@@ -1,93 +1,85 @@
 package com.danielrodriguez.topofreddit.presentation
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.danielrodriguez.topofreddit.MainThreadExecutor
 import com.danielrodriguez.topofreddit.R
-import com.danielrodriguez.topofreddit.dummy.DummyContent
-import java.util.ArrayList
+import com.danielrodriguez.topofreddit.domain.model.RedditPost
+import com.danielrodriguez.topofreddit.domain.usecase.IGetRedditTopPostsUseCase
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.concurrent.Executor
 import javax.inject.Inject
 
-class ItemListViewModel @Inject constructor(): ViewModel() {
+class ItemListViewModel @Inject constructor(
+    private val getRedditTopPostsUseCase: IGetRedditTopPostsUseCase,
+    private val backgroundExecutor: Executor
+): ViewModel() {
 
+    private val _error = MutableLiveData<Boolean>(false)
+    val error: LiveData<Boolean> = _error
 
-    private val ITEMS: MutableList<DummyContent.DummyItem> = ArrayList()
-
-
-    val hasMore: Boolean get() = ITEMS.size < 50
+    val hasMore: Boolean get() = (_posts.value?.size ?: 0) < 50
 
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val _posts = MutableLiveData<List<DummyContent.DummyItem>>()
-    val posts: LiveData<List<DummyContent.DummyItem>> = _posts
+    private val _posts = MutableLiveData<List<RedditPost>>()
+    val posts: LiveData<List<RedditPost>> = _posts
 
     val title: Int = R.string.app_name
 
+    private val compositeDisposable = CompositeDisposable()
+
     init {
-        for (i in 1..25) {
-            ITEMS.add(createDummyItem(i))
-        }
-
-        _posts.value = ITEMS
+        load()
     }
 
-    private fun createDummyItem(position: Int): DummyContent.DummyItem {
-        return DummyContent.DummyItem(
-            position.toString(),
-            "Item " + position,
-            makeDetails(position)
-        )
-    }
+    private fun load() {
+        _isLoading.value = true
 
-    private fun makeDetails(position: Int): String {
-        val builder = StringBuilder()
-        builder.append("Details about Item: ").append(position)
-        builder.append("\nMore details information here. $position")
-        return builder.toString()
+        getRedditTopPostsUseCase.invoke()
+            .observeOn(Schedulers.from(MainThreadExecutor()))
+            .subscribeOn(Schedulers.from(backgroundExecutor))
+            .subscribe({
+                _posts.value = it
+                _isLoading.value = false
+            }, {
+                _error.value = false
+                _isLoading.value = false
+            })
+            .addTo(compositeDisposable)
     }
 
     fun loadMore() {
-
         _isLoading.value = true
 
-        Thread {
-            Thread.sleep(2000)
-
-            Handler(Looper.getMainLooper()).post {
-                val start = ITEMS.size
-                val end = ITEMS.size + 25
-
-                for (i in start..end) {
-                    ITEMS.add(createDummyItem(i))
-                }
-
-                _posts.value = ITEMS
-
+        getRedditTopPostsUseCase.invoke(_posts.value?.last())
+            .observeOn(Schedulers.from(MainThreadExecutor()))
+            .subscribeOn(Schedulers.from(backgroundExecutor))
+            .subscribe({ posts ->
+                _posts.value = _posts.value?.toMutableList().also { it?.addAll(posts) }
                 _isLoading.value = false
-            }
-        }
-        .start()
+            }, {
+                _error.value = false
+                _isLoading.value = false
+            })
+            .addTo(compositeDisposable)
     }
 
     fun refresh() {
-        Thread {
-            Thread.sleep(2000)
-
-            Handler(Looper.getMainLooper()).post {
-                ITEMS.clear()
-
-                for (i in 1..25) {
-                    ITEMS.add(createDummyItem(i))
-                }
-
-                _posts.value = ITEMS
-
-                _isLoading.value = false
-            }
-        }
-            .start()
+        load()
     }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        compositeDisposable.clear()
+    }
+}
+
+fun Disposable.addTo(compositeDisposable: CompositeDisposable) {
+    compositeDisposable.add(this)
 }

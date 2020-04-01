@@ -6,6 +6,8 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [
+    ExecutorModule::class,
+    UseCaseModule::class,
     ViewModelModule::class
 ])
 interface AppComponent {

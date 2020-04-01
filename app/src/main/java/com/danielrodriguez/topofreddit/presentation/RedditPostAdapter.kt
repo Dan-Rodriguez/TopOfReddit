@@ -7,29 +7,29 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.danielrodriguez.topofreddit.R
-import com.danielrodriguez.topofreddit.dummy.DummyContent
+import com.danielrodriguez.topofreddit.domain.model.RedditPost
 import kotlinx.android.synthetic.main.item_list_content.view.*
 
 class RedditPostAdapter(private val parentActivity: FragmentActivity,
                                     private val twoPane: Boolean) :
     RecyclerView.Adapter<RedditPostAdapter.ViewHolder>() {
 
-    private var values = mutableListOf<DummyContent.DummyItem>()
+    private var values = mutableListOf<RedditPost>()
 
     private val onClickListener: View.OnClickListener
 
     init {
         onClickListener = View.OnClickListener { v ->
-            val item = v.tag as DummyContent.DummyItem
+            val item = v.tag as RedditPost
             if (twoPane) {
-                val fragment = ItemDetailFragment.newInstance(item.id, twoPane)
+                val fragment = ItemDetailFragment.newInstance(item, twoPane)
                 parentActivity.supportFragmentManager
                     .beginTransaction()
                     .replace(R.id.item_detail_container, fragment)
                     .commit()
             } else {
 
-                val fragment = ItemDetailFragment.newInstance(item.id, twoPane)
+                val fragment = ItemDetailFragment.newInstance(item, twoPane)
                 parentActivity.supportFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment)
@@ -47,7 +47,7 @@ class RedditPostAdapter(private val parentActivity: FragmentActivity,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
-        holder.idView.text = item.id
+        holder.idView.text = item.id.toString()
         holder.contentView.text = item.content
 
         with(holder.itemView) {
@@ -58,7 +58,7 @@ class RedditPostAdapter(private val parentActivity: FragmentActivity,
 
     override fun getItemCount() = values.size
 
-    fun submitList(it: List<DummyContent.DummyItem>) {
+    fun submitList(it: List<RedditPost>) {
         values = it.toMutableList()
         notifyDataSetChanged()
     }
