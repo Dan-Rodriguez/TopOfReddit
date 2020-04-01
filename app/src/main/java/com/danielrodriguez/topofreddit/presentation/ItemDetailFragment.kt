@@ -1,4 +1,4 @@
-package com.danielrodriguez.topofreddit
+package com.danielrodriguez.topofreddit.presentation
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import com.danielrodriguez.topofreddit.R
 import com.danielrodriguez.topofreddit.dummy.DummyContent
 import kotlinx.android.synthetic.main.item_detail.view.*
 

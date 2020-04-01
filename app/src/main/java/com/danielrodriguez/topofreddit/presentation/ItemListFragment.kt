@@ -1,4 +1,4 @@
-package com.danielrodriguez.topofreddit
+package com.danielrodriguez.topofreddit.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.danielrodriguez.topofreddit.R
 import com.danielrodriguez.topofreddit.dummy.DummyContent
 import kotlinx.android.synthetic.main.fragment_item_list.*
 import kotlinx.android.synthetic.main.item_list_content.view.*
@@ -30,7 +31,12 @@ class ItemListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        item_list.adapter = SimpleItemRecyclerViewAdapter(activity!!, DummyContent.ITEMS, isTablet)
+        item_list.adapter =
+            SimpleItemRecyclerViewAdapter(
+                activity!!,
+                DummyContent.ITEMS,
+                isTablet
+            )
     }
 
     class SimpleItemRecyclerViewAdapter(private val parentActivity: FragmentActivity,
