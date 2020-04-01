@@ -11,9 +11,10 @@ import com.danielrodriguez.topofreddit.dummy.DummyContent
 import kotlinx.android.synthetic.main.item_list_content.view.*
 
 class RedditPostAdapter(private val parentActivity: FragmentActivity,
-                                    private val values: List<DummyContent.DummyItem>,
                                     private val twoPane: Boolean) :
     RecyclerView.Adapter<RedditPostAdapter.ViewHolder>() {
+
+    private var values = mutableListOf<DummyContent.DummyItem>()
 
     private val onClickListener: View.OnClickListener
 
@@ -56,6 +57,11 @@ class RedditPostAdapter(private val parentActivity: FragmentActivity,
     }
 
     override fun getItemCount() = values.size
+
+    fun submitList(it: List<DummyContent.DummyItem>) {
+        values = it.toMutableList()
+        notifyDataSetChanged()
+    }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val idView: TextView = view.id_text

@@ -4,17 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.danielrodriguez.topofreddit.R
-import com.danielrodriguez.topofreddit.dummy.DummyContent
 import com.danielrodriguez.topofreddit.topOfRedditApplication
 import kotlinx.android.synthetic.main.fragment_item_list.*
-import kotlinx.android.synthetic.main.item_list_content.view.*
 import javax.inject.Inject
 
 class ItemListFragment : Fragment() {
@@ -40,7 +38,30 @@ class ItemListFragment : Fragment() {
 
         viewModel = ViewModelProvider(this, viewModelFactory)[ItemListViewModel::class.java]
 
-        item_list.adapter = RedditPostAdapter(activity!!, viewModel.items, isTablet)
+        val adapter = RedditPostAdapter(activity!!, isTablet)
+        item_list.adapter = adapter
+
+        viewModel.posts.observe(this, Observer {
+            adapter.submitList(it)
+        })
+
+        item_list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val linearLayoutManager: LinearLayoutManager =
+                    item_list.layoutManager as LinearLayoutManager
+
+                val totalItemCount = linearLayoutManager.itemCount
+                val lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition()
+
+                if (viewModel.isLoading.value == false && viewModel.hasMore) {
+                    if (lastVisibleItemPosition == totalItemCount - 1) {
+                        viewModel.loadMore()
+                    }
+                }
+            }
+        })
     }
 
     override fun onResume() {
