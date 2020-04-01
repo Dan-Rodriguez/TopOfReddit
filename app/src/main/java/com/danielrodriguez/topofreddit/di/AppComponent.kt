@@ -7,6 +7,8 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [
     ExecutorModule::class,
+    DataSourceModule::class,
+    MapperModule::class,
     RepositoryModule::class,
     UseCaseModule::class,
     ViewModelModule::class
