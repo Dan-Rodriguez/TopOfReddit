@@ -21,7 +21,7 @@ class ItemListViewModel @Inject constructor(
     private val _error = MutableLiveData<Boolean>(false)
     val error: LiveData<Boolean> = _error
 
-    val hasMore: Boolean get() = (_posts.value?.size ?: 0) < 50
+    val hasMore: Boolean get() = (_posts.value?.size ?: 0) < 24
 
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading

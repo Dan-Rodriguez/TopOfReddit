@@ -32,8 +32,8 @@ class ItemDetailFragment : Fragment() {
         arguments?.let {
             if (it.containsKey(POST)) {
                 it.getParcelable<RedditPost>(POST)?.let { post ->
-                    item_detail.text = post.details
-                    (activity as AppCompatActivity).supportActionBar?.title = post.content
+                    item_detail.text = post.title
+                    (activity as AppCompatActivity).supportActionBar?.title = post.author
 
                 } ?: run {
                     throw IllegalArgumentException(getString(R.string.not_a_post))

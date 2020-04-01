@@ -9,10 +9,6 @@ import kotlinx.android.synthetic.main.item_list.*
 
 class ItemListActivity : AppCompatActivity() {
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
     private var twoPane: Boolean
         get() = (item_detail_container != null)
         set(_) {}
@@ -47,5 +43,3 @@ class ItemListActivity : AppCompatActivity() {
         }
     }
 }
-
-val Int.isLandscape: Boolean get() = (this == Configuration.ORIENTATION_LANDSCAPE)

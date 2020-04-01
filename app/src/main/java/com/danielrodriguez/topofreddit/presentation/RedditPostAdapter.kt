@@ -47,8 +47,8 @@ class RedditPostAdapter(private val parentActivity: FragmentActivity,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
-        holder.idView.text = item.id.toString()
-        holder.contentView.text = item.content
+        holder.idView.text = item.id
+        holder.contentView.text = item.title
 
         with(holder.itemView) {
             tag = item
