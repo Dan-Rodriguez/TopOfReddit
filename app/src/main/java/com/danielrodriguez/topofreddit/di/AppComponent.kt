@@ -10,6 +10,7 @@ import javax.inject.Singleton
     DataSourceModule::class,
     MapperModule::class,
     RepositoryModule::class,
+    ServiceModule::class,
     UseCaseModule::class,
     ViewModelModule::class
 ])

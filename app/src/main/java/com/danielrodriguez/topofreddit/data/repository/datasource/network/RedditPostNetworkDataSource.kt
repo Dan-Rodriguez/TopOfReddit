@@ -1,59 +1,51 @@
 package com.danielrodriguez.topofreddit.data.repository.datasource.network
 
-import com.danielrodriguez.topofreddit.R
-import com.danielrodriguez.topofreddit.TopOfRedditApplication
 import com.danielrodriguez.topofreddit.data.repository.datasource.IRedditPostDataSource
-import com.google.gson.Gson
 import io.reactivex.rxjava3.core.Single
-import java.io.IOException
+import io.reactivex.rxjava3.core.SingleEmitter
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import javax.inject.Inject
 
-class RedditPostNetworkDataSource: IRedditPostDataSource {
+class RedditPostNetworkDataSource @Inject constructor(
+    private val service: RedditService
+): IRedditPostDataSource {
 
-    private val PAGE_SIZE = 12
+    private val PAGE_SIZE = 25
 
-    private var posts: List<RedditPostDto>
-
-    init {
-        val json = try {
-            val inputStream = TopOfRedditApplication.context.resources.openRawResource(R.raw.top)
-            val size: Int = inputStream.available()
-            val buffer = ByteArray(size)
-            inputStream.read(buffer)
-            inputStream.close()
-            String(buffer, Charsets.UTF_8)
-
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            null
+    private fun callback(emitter: SingleEmitter<List<RedditPostDto>>)
+    = object: Callback<RedditTopPostsCollectionDto> {
+        override fun onFailure(call: Call<RedditTopPostsCollectionDto>, t: Throwable) {
+            emitter.onError(t)
         }
 
-        val collection = Gson().fromJson<RedditTopPostsCollectionDto>(json, RedditTopPostsCollectionDto::class.java)
-        posts = collection.data.children.map { it.data }
+        override fun onResponse(
+            call: Call<RedditTopPostsCollectionDto>,
+            response: Response<RedditTopPostsCollectionDto>
+        ) {
+            if (response.isSuccessful) {
+                val posts = response.body()
+                emitter.onSuccess(posts?.data?.children?.map { postDtoData ->
+                    postDtoData.data.also { it.kind = postDtoData.kind }
+                } ?: listOf())
+
+            } else {
+                emitter.onError(Exception(response.errorBody().toString()))
+            }
+        }
     }
 
     override fun topPosts(): Single<List<RedditPostDto>> {
         return Single.create {
-            val pagePosts = mutableListOf<RedditPostDto>()
-
-            for (i in 0 until PAGE_SIZE) {
-                pagePosts.add(posts[i])
-            }
-
-            it.onSuccess(pagePosts)
+            service.top(PAGE_SIZE).enqueue(callback(it))
         }
     }
 
     override fun topPostsAfter(post: RedditPostDto): Single<List<RedditPostDto>> {
         return Single.create {
-            val pagePosts = mutableListOf<RedditPostDto>()
-            val start = posts.indexOf(post)
-            val end = start + PAGE_SIZE
-
-            for (i in start until end) {
-                pagePosts.add(posts[i])
-            }
-
-            it.onSuccess(pagePosts)
+            val key = "${post.kind}_${post.id}"
+            service.topAfter(key, PAGE_SIZE).enqueue(callback(it))
         }
     }
 }
