@@ -19,7 +19,7 @@ class RedditPostAdapter(
     private val twoPane: Boolean
 ): RecyclerView.Adapter<RedditPostAdapter.ViewHolder>() {
 
-    private var posts = mutableListOf<RedditPost>()
+    private var viewModel: ItemListViewModel? = null
 
     private val onClickListener: View.OnClickListener
 
@@ -52,45 +52,47 @@ class RedditPostAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val item = posts[position]
-
-        with(holder) {
-            with(itemView) {
-                alpha = 1f
-                tag = item
-                setOnClickListener {
-                    viewItem(holder)
-                    onClickListener.onClick(it)
+        viewModel?.getPostAt(position)?.let { item ->
+            with(holder) {
+                with(itemView) {
+                    alpha = 1f
+                    tag = item
+                    setOnClickListener {
+                        viewItem(holder)
+                        viewModel?.viewAt(holder.adapterPosition)
+                        onClickListener.onClick(holder.itemView)
+                    }
                 }
-            }
-            authorTextView.text = item.author
-            titleTextView.text = item.title
-            dismissButton.setOnClickListener {
-                deleteItem(holder)
-            }
-            commentCountTextView.text = parentActivity.resources.getQuantityString(R.plurals.x_comments, item.numberOfComments, item.numberOfComments)
-            viewedView.alpha = if (item.viewed) 0f else 1f
+                authorTextView.text = item.author
+                titleTextView.text = item.title
+                dismissButton.setOnClickListener {
+                    deleteItem(holder)
+                }
+                commentCountTextView.text = parentActivity.resources.getQuantityString(R.plurals.x_comments, item.numberOfComments, item.numberOfComments)
+                viewedView.alpha = if (item.viewed) 0f else 1f
 
-            val quantity = if (item.hoursAgo == 1L) 1 else 0
-            timestampTextView.text = parentActivity.resources.getQuantityString(R.plurals.x_hours_ago, quantity, item.hoursAgo)
+                val quantity = if (item.hoursAgo == 1L) 1 else 0
+                timestampTextView.text = parentActivity.resources.getQuantityString(R.plurals.x_hours_ago, quantity, item.hoursAgo)
 
-            if (item.thumbnail.isNotEmpty()) {
-                Picasso.get().load(item.thumbnail).into(imageView)
+                if (item.thumbnail.isNotEmpty()) {
+                    Picasso.get().load(item.thumbnail).into(imageView)
+                }
             }
         }
     }
 
     private fun viewItem(holder: ViewHolder) {
-        val animation = AnimationUtils.loadAnimation(
-            holder.itemView.context,
-            android.R.anim.fade_out
-        )
-        animation.duration = holder.itemView.context.resources.getInteger(R.integer.animation_duration).toLong()
-        animation.onAnimationEnd {
-            holder.viewedView.alpha = 0f
-            posts[holder.adapterPosition].viewed = true
+        viewModel?.getPostAt(holder.adapterPosition)?.let { item ->
+            val animation = AnimationUtils.loadAnimation(
+                holder.itemView.context,
+                android.R.anim.fade_out
+            )
+            animation.duration = holder.itemView.context.resources.getInteger(R.integer.animation_duration).toLong()
+            animation.onAnimationEnd {
+                holder.viewedView.alpha = 0f
+            }
+            holder.viewedView.startAnimation(animation)
         }
-        holder.viewedView.startAnimation(animation)
     }
 
     private fun deleteItem(holder: ViewHolder) {
@@ -104,16 +106,16 @@ class RedditPostAdapter(
             holder.itemView.alpha = 0f
 
             val position = holder.adapterPosition
-            posts.removeAt(position)
+            viewModel?.removePostAt(position)
             notifyItemRemoved(position)
         }
         holder.itemView.startAnimation(animation)
     }
 
-    override fun getItemCount() = posts.size
+    override fun getItemCount() = viewModel?.postsCount ?: 0
 
-    fun submitList(it: List<RedditPost>) {
-        posts = it.toMutableList()
+    fun submitList(viewModel: ItemListViewModel) {
+        this.viewModel = viewModel
         notifyDataSetChanged()
     }
 

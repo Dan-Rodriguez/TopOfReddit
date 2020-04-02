@@ -61,7 +61,7 @@ class ItemListFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory)[ItemListViewModel::class.java]
 
         viewModel.posts.observe(this, Observer {
-            adapter.submitList(it)
+            adapter.submitList(viewModel)
         })
 
         viewModel.isLoading.observe(this, Observer {
