@@ -18,7 +18,15 @@ class ItemListViewModel @Inject constructor(
     private val backgroundExecutor: Executor
 ): ViewModel() {
 
-    val postsCount: Int get() = _posts.value?.size ?: 0
+    val reddistPostViewModels: List<RedditPostViewModel>
+        get() {
+            _posts.value?.let {
+                return it.map { RedditPostViewModel(it) }
+
+            } ?: run {
+                return listOf()
+            }
+        }
 
     private val _error = MutableLiveData<Boolean>(false)
     val error: LiveData<Boolean> = _error
@@ -81,39 +89,21 @@ class ItemListViewModel @Inject constructor(
         compositeDisposable.clear()
     }
 
-    fun getPostAt(position: Int): RedditPost? {
-
-        if (!validPosition(position)) {
-            return null
-        }
-
-        return _posts.value?.get(position)
-    }
-
-    private fun validPosition(position: Int): Boolean {
-        return (0 <= position && position < _posts.value?.size ?: 0)
-    }
-
-    fun removePostAt(position: Int) {
-        if (!validPosition(position)) {
-            return
-        }
-
+    fun deletePost(post: RedditPostViewModel) {
         _posts.value?.toMutableList()?.let {
-            it.removeAt(position)
+            it.remove(post.post)
             _posts.value = it
         }
     }
 
-    fun viewAt(position: Int) {
-        if(!validPosition(position)) {
+    fun viewedPost(post: RedditPostViewModel) {
+        if (_posts.value?.contains(post.post) == false) {
             return
         }
 
-        _posts.value?.let {
-            it[position].viewed = true
-            _posts.value = it
-        }
+        _posts.value
+            ?.first { it.id == post.id }
+            ?.apply { viewed = true }
     }
 }
 
