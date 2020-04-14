@@ -1,14 +1,14 @@
 package com.danielrodriguez.topofreddit.presentation
 
+import android.app.Application
 import com.danielrodriguez.topofreddit.R
-import com.danielrodriguez.topofreddit.TopOfRedditApplication
 import com.danielrodriguez.topofreddit.domain.model.RedditPost
+import javax.inject.Inject
 
-class RedditPostViewModel(
+class RedditPostViewModel @Inject constructor(
+    val application: Application,
     val post: RedditPost
 ) {
-    private val context = TopOfRedditApplication.context
-
     val id: String = post.id
     val thumbnailPlaceholder: Int = android.R.drawable.ic_menu_camera
     val thumbnail = post.thumbnail
@@ -19,10 +19,10 @@ class RedditPostViewModel(
         get() {
             val quantity = if (post.hoursAgo == 1L) 1 else 0
 
-            return context.resources.getQuantityString(R.plurals.x_hours_ago, quantity, post.hoursAgo)
+            return application.resources.getQuantityString(R.plurals.x_hours_ago, quantity, post.hoursAgo)
         }
     val numberOfComments: String
         get() {
-            return context.resources.getQuantityString(R.plurals.x_comments, post.numberOfComments, post.numberOfComments)
+            return application.resources.getQuantityString(R.plurals.x_comments, post.numberOfComments, post.numberOfComments)
         }
 }
