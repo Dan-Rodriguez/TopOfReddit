@@ -65,7 +65,7 @@ class TestRedditPostRepository {
     fun testTopPostsError() {
         val mapper = RedditPostMapper()
         val dataSource = mock(IRedditPostDataSource::class.java)
-        `when`(dataSource.topPosts()).thenAnswer { Single.just(IllegalArgumentException()) }
+        `when`(dataSource.topPosts()).thenAnswer { Single.error<RedditPostDto>(IllegalArgumentException()) }
 
         val repository = RedditPostRepository(dataSource, mapper)
 
@@ -76,7 +76,7 @@ class TestRedditPostRepository {
             .test()
         testObserver.assertValueCount(0)
         testScheduler.advanceTimeBy(1L, TimeUnit.SECONDS)
-        testObserver.assertError { true }
+        testObserver.assertError { it is IllegalArgumentException }
 
         testObserver.dispose()
     }
@@ -143,7 +143,7 @@ class TestRedditPostRepository {
 
         val mapper = RedditPostMapper()
         val dataSource = mock(IRedditPostDataSource::class.java)
-        `when`(dataSource.topPostsAfter(last)).thenAnswer { Single.just(IllegalArgumentException()) }
+        `when`(dataSource.topPostsAfter(last)).thenAnswer { Single.error<RedditPostDto>(IllegalArgumentException()) }
 
         val repository = RedditPostRepository(dataSource, mapper)
 
@@ -154,7 +154,7 @@ class TestRedditPostRepository {
             .test()
         testObserver.assertValueCount(0)
         testScheduler.advanceTimeBy(1L, TimeUnit.SECONDS)
-        testObserver.assertError { true }
+        testObserver.assertError { it is IllegalArgumentException }
 
         testObserver.dispose()
     }
