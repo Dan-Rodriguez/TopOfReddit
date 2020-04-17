@@ -25,13 +25,14 @@ class RedditPostNetworkDataSource @Inject constructor(
             response: Response<RedditTopPostsCollectionDto>
         ) {
             if (response.isSuccessful) {
-                val posts = response.body()
-                emitter.onSuccess(posts?.data?.children?.map { postDtoData ->
+                response.body()?.data?.children?.map { postDtoData ->
                     postDtoData.data.also { it.kind = postDtoData.kind }
-                } ?: listOf())
+                }?.let {
+                    emitter.onSuccess(it)
+                } ?: emitter.onError(NoSuchElementException())
 
             } else {
-                emitter.onError(Exception(response.errorBody().toString()))
+                emitter.onError(Exception(response.errorBody()?.string()))
             }
         }
     }
