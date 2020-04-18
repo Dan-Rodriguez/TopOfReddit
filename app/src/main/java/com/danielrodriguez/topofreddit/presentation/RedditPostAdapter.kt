@@ -59,10 +59,14 @@ class RedditPostAdapter: RecyclerView.Adapter<RedditPostAdapter.ViewHolder>() {
         fun bind(viewModel: RedditPostViewModel) {
             authorTextView.text = viewModel.author
             titleTextView.text = viewModel.title
-            commentCountTextView.text = viewModel.numberOfComments
+            viewModel.numberOfCommentsResource.also {
+                commentCountTextView.text = itemView.context.resources.getQuantityString(it.id, it.quantity, it.arg)
+            }
             viewedView.alpha = 1f
             viewedView.alpha = viewModel.viewedAlpha
-            timestampTextView.text = viewModel.timeStamp
+            viewModel.timeStamp.also {
+                timestampTextView.text = itemView.context.resources.getQuantityString(it.id, it.quantity, it.arg)
+            }
 
             dismissButton.setOnClickListener {
                 redditPostAdapterListener?.onPostDeleteButtonClicked(this, post)

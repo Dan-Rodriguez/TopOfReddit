@@ -1,6 +1,5 @@
 package com.danielrodriguez.topofreddit.presentation
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,7 +14,6 @@ import java.util.concurrent.Executor
 import javax.inject.Inject
 
 class ItemListViewModel @Inject constructor(
-    private val application: Application,
     private val getRedditTopPostsUseCase: IGetRedditTopPostsUseCase,
     private val backgroundExecutor: Executor
 ): ViewModel() {
@@ -23,7 +21,7 @@ class ItemListViewModel @Inject constructor(
     val reddistPostViewModels: List<RedditPostViewModel>
         get() {
             _posts.value?.let {
-                return it.map { RedditPostViewModel(application, it) }
+                return it.map { RedditPostViewModel(it) }
 
             } ?: run {
                 return listOf()

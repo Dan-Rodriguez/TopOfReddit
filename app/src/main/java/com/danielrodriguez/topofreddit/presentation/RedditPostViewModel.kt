@@ -6,7 +6,6 @@ import com.danielrodriguez.topofreddit.domain.model.RedditPost
 import javax.inject.Inject
 
 class RedditPostViewModel @Inject constructor(
-    val application: Application,
     val post: RedditPost
 ) {
     val id: String = post.id
@@ -15,14 +14,14 @@ class RedditPostViewModel @Inject constructor(
     val viewedAlpha = if (post.viewed) 0f else 1f
     val title = post.title
     val author = post.author
-    val timeStamp: String
+    val timeStamp: QuantityStringResource<Long>
         get() {
             val quantity = if (post.hoursAgo == 1L) 1 else 0
 
-            return application.resources.getQuantityString(R.plurals.x_hours_ago, quantity, post.hoursAgo)
+            return QuantityStringResource(R.plurals.x_hours_ago, quantity, post.hoursAgo)
         }
-    val numberOfComments: String
+    val numberOfCommentsResource: QuantityStringResource<Int>
         get() {
-            return application.resources.getQuantityString(R.plurals.x_comments, post.numberOfComments, post.numberOfComments)
+            return QuantityStringResource(R.plurals.x_comments, post.numberOfComments, post.numberOfComments)
         }
 }
